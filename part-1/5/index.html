@@ -31,7 +31,11 @@
         <a-entity id="my-car-geometry">
 
           <a-entity obj-model="obj: #flying-car-body-obj;" 
-            material="color:green"
+            material="
+              src:/images/tiger-texture.png;
+              envMap: #sky-cubemap;
+              metalness:.8;
+              roughness:0;"
             shadow="cast:true">
           </a-entity>
   
@@ -48,6 +52,7 @@
       </a-entity>
 
       <a-entity light="type: ambient; intensity: .2" ></a-entity>
+      
       
       <a-entity camera="userHeight: 1" position="0 1 -3" rotation="0 180 0" look-controls></a-entity>
 
