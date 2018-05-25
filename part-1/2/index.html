@@ -4,9 +4,19 @@
   </head>
   <body>
 
+    <!-adding an antialiasing tag-> 
     <a-scene shadow antialiasing>
 
-      <a-entity id="my-box" geometry="primitive: box;" position="0 1.5 0" shadow="cast: true;"  material="color: red;"></a-entity>
+      <a-assets>
+
+        <audio id="sample-audio" loop="true" src="/audio/sample.mp3"></audio>
+
+      </a-assets>
+
+      <!-sound is attached to the box object, so it pans along with the box's movement-> 
+      <a-entity id="my-box" sound="src:#sample-audio;loop:true;" geometry="primitive: box;" position="-40 " shadow="cast: true;"  material="color: red;">
+        <a-animation attribute="position" dur="5000" to="40 1.5 0" direction="alternate" repeat="indefinite"></a-animation>
+      </a-entity>
 
       <a-entity geometry="primitive: plane; width: 100; height: 100;" rotation="270 0 0" shadow="receive: true;" material="color: blue;"></a-entity>
 
@@ -14,10 +24,11 @@
 
       <a-entity light="type: ambient; intensity: .2" ></a-entity>
       
-      <a-entity camera="userHeight: 3;" position="0 0 4" look-controls></a-entity>
+      <a-entity camera="userHeight: 1;" position="0 0 2" look-controls></a-entity>
 
     </a-scene>
 
+    <!-everything in the script tag is just getting the audio to play-> 
     <script type="text/javascript">
       document.querySelector('a-scene').addEventListener('loaded', function() {
         let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
