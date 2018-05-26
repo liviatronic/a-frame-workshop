@@ -1,26 +1,97 @@
 <html>
-  <head>
-    <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
-  </head>
-  
-  <body>
-    <a-scene antialias="true">
-      <a-sky color="#000"></a-sky>
-      <a-entity camera position="0 10 4" look-controls></a-entity>
-    </a-scene>
 
-    <script type="text/javascript">
-
-      // get random hex color
-      function getRandomColor() {
-        let letters = '0123456789abcdef';
-        let randomColor = '';
-        for (let i = 0; i < 6; i++) {
-          randomColor += letters[Math.floor(Math.random() * 16)];
+<head>
+  <script src="https://aframe.io/releases/0.7.1/aframe.min.js"></script>
+  <script type="text/javascript">
+    AFRAME.registerComponent('my-animation', {
+      schema: {
+        speedX: {
+          type: 'float',
+          default: 0
+        },
+        totalSizeX: {
+          type: 'float'
+        },
+        phase: {
+          type: 'float',
+          default: 0
+        },
+        height: {
+          type: 'float'
         }
-        return randomColor;
-      }
+      },
+      tick: function (time, timeDelta) {
+        let position = this.el.object3D.position;
+        position.setY(this.data.height * (Math.sin((time * .001) + this.data.phase)));
+        position.setX(position.x + (this.data.speedX * (timeDelta)));
 
-    </script>
+        if (position.x >= (this.data.totalSizeX)) {
+          position.setX(0);
+        }
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <a-scene antialias="true" fog="type:linear; color: #000; near:15; far:25;">
+    <a-sky color="#000"></a-sky>
+    <a-entity camera position="0 20 4" look-controls></a-entity>
+  </a-scene>
+
+  <script type="text/javascript">
+    let scene = document.querySelector('a-scene');
+    let elementRadius = 3;
+    let objectCount = 20;
+    let elementSpacing = -1.7;
+    let size = (elementRadius * 2) + elementSpacing;
+    let totalSize = objectCount * size;
+    let speedX = .05;
+
+    let containerElement = document.createElement('a-entity');
+    containerElement.setAttribute('position', `${-.5 * totalSize} 0 ${-.5 * totalSize}`);
+    scene.appendChild(containerElement);
+
+
+    function create3DObject(x, z, phase) {
+
+      let element = document.createElement('a-entity');
+      element.setAttribute('geometry', `primitive: sphere; radius: ${elementRadius};`);
+      element.setAttribute('material', `color: #${getRandomColor()}; metalness:0; roughness:0;`);
+      element.setAttribute('position', `${x} 0 ${z}`);
+      element.setAttribute('my-animation', `height: 7; phase: ${phase}; totalSizeX: ${totalSize}; speedX: ${speedX}`);
+
+      containerElement.appendChild(element);
+
+    }
+
+
+    function addObjects() {
+      for (let i = 0; i < objectCount; i++) {
+
+        for (let j = 0; j < objectCount; j++) {
+
+          let phase = 2 * Math.PI * i / objectCount + 2 * Math.PI * j / objectCount;
+          create3DObject(i * size, j * size, phase);
+        }
+
+      }
+    }
+
+    create3DObject();
+    addObjects();
+
+    // get random hex color
+    function getRandomColor() {
+      let letters = '0123456789abcdef';
+      let randomColor = '';
+      for (let i = 0; i < 6; i++) {
+        randomColor += letters[Math.floor(Math.random() * 16)];
+      }
+      return randomColor;
+    }
+  </script>
+
   <body>
+
 </html>

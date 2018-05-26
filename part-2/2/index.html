@@ -1,48 +1,92 @@
 <html>
-  <head>
-    <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
-  </head>
-  <body>
 
-    <a-scene shadows>
+<head>
+  <script src="https://aframe.io/releases/0.8.0/aframe.min.js"></script>
+</head>
 
-      <a-assets>
+<body>
 
-        <img id="sky" src="/images/panorama.jpg">
+  <script type="text/javascript">
+    //components run in the head because they're global
+    AFRAME.registerComponent('rainbow', {
+      init: function () {
+        //color goes from zero to 1
+        this.hue = 0;
+        //grabbing material from the object it's put on. 'el' is the html element
+        this.material = this.el.getOrCreateObject3D('mesh').material;
+      },
+      //schema lets us define the variables we can use
+      schema: {
+        cyclespeed: {
+          type: 'float',
+          default: .001
+        }
+      },
+      //tick is a method called on each render loop
+      tick: function () {
+        this.hue += this.data.cyclespeed;
+        this.material.color.setHSL(this.hue % 1, 1, .5);
+      }
+    });
+  </script>
 
-        <a-cubemap id="sky-cubemap">
-          <img src="/images/cubemap/px.png">
-          <img src="/images/cubemap/nx.png">
-          <img src="/images/cubemap/py.png">
-          <img src="/images/cubemap/ny.png">
-          <img src="/images/cubemap/pz.png">
-          <img src="/images/cubemap/nz.png">
-        </a-cubemap>
+  <a-scene shadows>
 
-      </a-assets>
+    <a-assets>
 
-      <a-sky src="#sky"></a-sky>
+      <img id="sky" src="/images/panorama.jpg">
 
-      <a-entity geometry="primitive:box;" position="0 1 0" material="color: red; metalness: .9; roughness: 0; envMap: #sky-cubemap;" shadow="cast: true;">
+      <!-- Add this so the sky image reflects onto the objects -->
+      <a-cubemap id="sky-cubemap">
+        <img src="/images/cubemap/px.png">
+        <img src="/images/cubemap/nx.png">
+        <img src="/images/cubemap/py.png">
+        <img src="/images/cubemap/ny.png">
+        <img src="/images/cubemap/pz.png">
+        <img src="/images/cubemap/nz.png">
+      </a-cubemap>
 
-        <a-entity geometry="primitive: cylinder;" position="1 1 1" rotation="45 45 45" scale=".3 .3 .3" material="color: purple; metalness: .5; roughness: 0; envMap: #sky-cubemap;" shadow="cast: true;"></a-entity>
+    </a-assets>
 
-        <a-entity geometry="primitive: torus;" position="-1 1 1" rotation="90 45 45" scale=".3 .3 .3" material="color: orange; metalness: 1; roughness: 0; envMap: #sky-cubemap;" shadow="cast: true;"></a-entity>
-        
-        <a-animation attribute="rotation" dur="4000" to="0 359.999 0" repeat="indefinite" easing="linear"></a-animation>
+    <a-sky src="#sky"></a-sky>
 
-      </a-entity>
+    <!-- Adding the word rainbow at the end adds the attribute (aka component) rainbow in the JS to this primitive -->
+    <a-entity geometry="primitive:box;" position="0 1 0" material="color: red; metalness: .9; roughness: 0; envMap: #sky-cubemap;"
+      shadow="cast: true;" rainbow="cyclespeed: 0.01;">
 
-      <a-entity geometry="primitive: plane; width: 10; height: 10;" rotation="270 0 0" shadow="receive: true;" material="color: blue;"></a-entity>
+      <a-entity geometry="primitive: cylinder;" position="1 1 1" rotation="45 45 45" scale=".3 .3 .3" material="color: purple; metalness: .5; roughness: 0; envMap: #sky-cubemap;"
+        shadow="cast: true;"></a-entity>
 
-      <a-entity light="type: point; castShadow: true" position="3 6 5"></a-entity>
+      <a-entity geometry="primitive: torus;" position="-1 1 1" rotation="90 45 45" scale=".3 .3 .3" material="color: orange; metalness: 1; roughness: 0; envMap: #sky-cubemap;"
+        shadow="cast: true;"></a-entity>
 
-      <a-entity light="type: ambient; intensity: .2" ></a-entity>
+      <a-animation attribute="rotation" dur="4000" to="0 359.999 0" repeat="indefinite" easing="linear"></a-animation>
 
-      <a-entity camera="userHeight: 3;" position="0 0 4" look-controls wasd-controls></a-entity>
+      <!-- The added cursor is triggering these animations on mouseenter and mouseleave -->
+      <a-animation attribute="scale" begin="mouseenter" dur="300" to="2 2 2"></a-animation>
 
-    </a-scene>
+      <a-animation attribute="scale" begin="mouseleave" dur="300" to="1 1 1"></a-animation>
 
-  </body>
+      <!-- Adding the 'rainbow' component to the animation -->
+      <a-animation attribute="rainbow.cyclespeed" begin="mouseenter" dur="300" to=".1" easing="ease-in-out"></a-animation>
+
+      <a-animation attribute="rainbow.cyclespeed" begin="mouseleave" dur="300" to=".001" easing="ease-in-out"></a-animation>
+
+    </a-entity>
+
+    <a-entity geometry="primitive: plane; width: 10; height: 10;" rotation="270 0 0" shadow="receive: true;" material="color: blue;"></a-entity>
+
+    <a-entity light="type: point; castShadow: true" position="3 6 5"></a-entity>
+
+    <a-entity light="type: ambient; intensity: .2"></a-entity>
+
+    <a-entity camera="userHeight: 3;" position="0 0 4" look-controls wasd-controls>
+      <!-- Adding a cursor as a child of the camera -->
+      <a-cursor></a-cursor>
+    </a-entity>
+
+  </a-scene>
+
+</body>
+
 </html>
-
